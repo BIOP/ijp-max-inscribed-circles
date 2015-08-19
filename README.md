@@ -1,5 +1,5 @@
-# multi-stack-montage
-An ImageJ1 plugin for making montages out of stacks
+# Maximum Inscribed Circles
+An ImageJ1 plugin that find the largest inscribed circle based on the Distance Map of an input mask
 
 
 This is the Eclipse project for this plugin. If you just want to use it, I recommend you install Fiji and tick our update site (PTBIOP).
