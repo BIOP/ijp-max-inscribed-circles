@@ -23,32 +23,42 @@ public class Max_Inscribed_Circles implements PlugIn {
 	
 	private RoiManager rm;
 	private double minD;
+	private boolean isSelectionOnly;
 	
 	
 	@Override
 	public void run(String arg0) {
 		
 		ImagePlus imp = IJ.getImage();
+		if (!imp.getProcessor().isBinary() && imp.getRoi() == null) {
+			IJ.error("Need selection or a binary image!");
+		}
+		
 		this.minD = Prefs.get("largest.circ.minD", 4);
+		this.isSelectionOnly = Prefs.get("largest.circ.isSelOnly", false);
 		
-		
-GenericDialog gd = new GenericDialog("Find Largest Circles");
+		GenericDialog gd = new GenericDialog("Find Largest Circles");
 		
 		gd.addNumericField("Minimum Disk Diameter (px)", this.minD, 1);
 		gd.addMessage("Set to 0 to get only the largest inscribed circle");
+		gd.addCheckbox("Use selection instead of mask", this.isSelectionOnly);
+
 		gd.showDialog();
 		
 		if(gd.wasCanceled()) {
 			return;			
 		}
 		
-		minD = gd.getNextNumber();
-		Prefs.set("largest.circ.minD", minD);
+		this.minD = gd.getNextNumber();
+		this.isSelectionOnly = gd.getNextBoolean();
+		
+		Prefs.set("largest.circ.minD", this.minD);
+		Prefs.set("largest.circ.isSelOnly", this.isSelectionOnly);
 
 		
 		
 		//Run the function
-		ArrayList<Roi> circles = MaxInscribedCircles.findCircles(imp, minD);
+		ArrayList<Roi> circles = MaxInscribedCircles.findCircles(imp, this.minD, this.isSelectionOnly);
 	
 		//Add ROIS
 		rm = RoiManager.getInstance();
@@ -66,10 +76,6 @@ GenericDialog gd = new GenericDialog("Find Largest Circles");
 
 	/**
 	 * Main method for debugging.
-	 *
-	 * For debugging, it is convenient to have a method that starts ImageJ, loads an
-	 * image and calls the plugin, e.g. after setting breakpoints.
-	 * A charming example by Lord Dr. Romain G, Queen Emeritus of Deadly Neo Australia 
 	 * @param args unused
 	 */
 	public static void main(String[] args) {
