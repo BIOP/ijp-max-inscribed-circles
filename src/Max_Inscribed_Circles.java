@@ -33,7 +33,6 @@ public class Max_Inscribed_Circles implements PlugIn {
 		if (!imp.getProcessor().isBinary() && imp.getRoi() == null) {
 			IJ.error("Need selection or a binary image!");
 		}
-		
 		this.minD = Prefs.get("largest.circ.minD", 4);
 		this.isSelectionOnly = Prefs.get("largest.circ.isSelOnly", false);
 		
@@ -48,7 +47,6 @@ public class Max_Inscribed_Circles implements PlugIn {
 		if(gd.wasCanceled()) {
 			return;			
 		}
-		
 		this.minD = gd.getNextNumber();
 		this.isSelectionOnly = gd.getNextBoolean();
 		
