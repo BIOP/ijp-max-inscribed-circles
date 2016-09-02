@@ -84,7 +84,7 @@ public class Max_Inscribed_Circles implements PlugIn {
 		// start ImageJ
 		new ImageJ();
 		
-		ImagePlus imp1 = IJ.openImage("E:\\AuPbSn40.tif");
+		ImagePlus imp1 = IJ.openImage("http://imagej.nih.gov/ij/images/AuPbSn40.jpg");
 		IJ.setAutoThreshold(imp1, "Default");
 		Prefs.blackBackground = false;
 		IJ.run(imp1, "Convert to Mask", "");

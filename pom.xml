@@ -54,6 +54,7 @@
 		<dependency>
 			<groupId>net.imagej</groupId>
 			<artifactId>ij</artifactId>
+			<version>1.51f</version>
 		</dependency>
 		<dependency>
 			<groupId>fiji</groupId>
