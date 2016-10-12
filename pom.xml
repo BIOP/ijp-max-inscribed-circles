@@ -8,12 +8,12 @@
 	<parent>
 		<groupId>net.imagej</groupId>
 		<artifactId>pom-imagej</artifactId>
-		<version>7.0.0</version>
+		<version>16.5.0</version>
 		<relativePath />
 	</parent>
 
 	<groupId>ch.epfl.biop</groupId>
-	<version>0.1.0-SNAPSHOT</version>
+	<version>1.0.0-SNAPSHOT</version>
 
 	<name>plugins/Max_Inscribed_Circles.jar</name>
 <repositories>
@@ -40,9 +40,10 @@
 	</developers>
 
 	<scm>
-		<connection>scm:git:git://github.com/lacan/max-inscribed-circles.git</connection>
+		<connection>https://c4science.ch/diffusion/1404/ijp-max-inscribed-circles.git</connection>
 		<tag>HEAD</tag>
-		<url>https://github.com/lacan/max-inscribed-circles/</url>
+		<url>https://c4science.ch/diffusion/1404</url>
+		<developerConnection>oburri</developerConnection>
 	</scm>
 
 	<properties>
@@ -54,7 +55,6 @@
 		<dependency>
 			<groupId>net.imagej</groupId>
 			<artifactId>ij</artifactId>
-			<version>1.51f</version>
 		</dependency>
 		<dependency>
 			<groupId>fiji</groupId>
