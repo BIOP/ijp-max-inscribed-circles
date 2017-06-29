@@ -86,7 +86,7 @@ public class MaxInscribedCircles {
 			
 			// Sort them and only process those that have the maximum size above the minD
 			ArrayList<Point> hits = getSortedPoints(points, minD, dist_map_ip);
-			
+						
 			// Make this list an ArrayList so we can easily add or pop elements
 			// ArrayList<Point> hits = new ArrayList<Point>();
 			//for(int i=0;i<points.npoints; i++) {
@@ -133,6 +133,9 @@ public class MaxInscribedCircles {
 					allrois.add(circ);
 					done=false;
 
+				}
+				if (minD == 0.0) {
+					return allrois;
 				}
 			}
 		}
