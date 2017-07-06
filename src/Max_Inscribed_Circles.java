@@ -4,6 +4,7 @@ import ij.ImageJ;
 import ij.ImagePlus;
 import ij.Prefs;
 import ij.gui.GenericDialog;
+import ij.gui.OvalRoi;
 import ij.gui.Roi;
 import ij.plugin.PlugIn;
 import ij.plugin.frame.RoiManager;
@@ -84,12 +85,16 @@ public class Max_Inscribed_Circles implements PlugIn {
 		// start ImageJ
 		new ImageJ();
 		
-		ImagePlus imp1 = IJ.openImage("http://imagej.nih.gov/ij/images/AuPbSn40.jpg");
-		IJ.setAutoThreshold(imp1, "Default");
-		Prefs.blackBackground = false;
-		IJ.run(imp1, "Convert to Mask", "");
-		imp1.show();
 		
+		
+		ImagePlus imp = IJ.createImage("Untitled", "8-bit black", 256, 256, 1);
+		imp.setRoi(45,59,70,88);
+		IJ.setForegroundColor(255, 255, 255);
+		IJ.run(imp, "Fill", "slice");
+		//IJ.setTool("oval");
+		imp.setRoi(new OvalRoi(156,68,54,95));
+		IJ.run(imp, "Fill", "slice");
+		imp.show();
 	}
 
 }

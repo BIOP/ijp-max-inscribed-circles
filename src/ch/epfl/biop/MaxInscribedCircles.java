@@ -57,8 +57,8 @@ public class MaxInscribedCircles {
 			
 			ip = new ByteProcessor(iptmp.getWidth()+4, iptmp.getHeight()+4);
 			ip.copyBits(iptmp, 2,2, Blitter.ADD);
-			offsetX-=2;
-			offsetY-=2;
+			offsetX-=1;
+			offsetY-=1;
 
 		// Otherwise use the whole image
 		} else {
