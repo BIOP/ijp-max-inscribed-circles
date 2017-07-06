@@ -2,6 +2,8 @@ package ch.epfl.biop;
 
 import java.awt.Point;
 import java.awt.Polygon;
+import java.lang.Double;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -85,26 +87,21 @@ public class MaxInscribedCircles {
 			
 			
 			// Sort them and only process those that have the maximum size above the minD
-			ArrayList<Point> hits = getSortedPoints(points, minD, dist_map_ip);
-						
-			// Make this list an ArrayList so we can easily add or pop elements
-			// ArrayList<Point> hits = new ArrayList<Point>();
-			//for(int i=0;i<points.npoints; i++) {
-			//	hits.add(new Point(points.xpoints[i], points.ypoints[i]));
-			//}
+			ArrayList<Point2D.Double> hits = getSortedPoints(points, minD, dist_map_ip);
+					
 			
 			done=true;
 			for (int k =0; k<hits.size(); k++) {
 				boolean is_draw = true;
-				Point p = hits.get(k);
+				Point2D.Double p = hits.get(k);
 				r = dist_map_ip.getInterpolatedValue(p.x, p.y);
 
-				ArrayList<Point> neigh = findNeighbors(p, hits, dist_map_ip);
+				ArrayList<Point2D.Double> neigh = findNeighbors(p, hits, dist_map_ip);
 				//IJ.log("Point "+p.toString()+" r:"+r+"has "+neigh.size()+" neighbors");
 				// It's not about the NEAREST point. it's IF THERE ARE points whose coordinates are within the radius
 				if (neigh.size() > 1) {
 					// Draw only if it's the largest.
-					for( Point pp : neigh) {
+					for( Point2D.Double pp : neigh) {
 						double r2 = dist_map_ip.getInterpolatedValue(pp.x, pp.y);
 						if (r < r2) {
 							is_draw = false;
@@ -115,8 +112,8 @@ public class MaxInscribedCircles {
 				
 				if(is_draw) {
 					// Get coordinates of circle
-					posx = (p.x)-r+0.5;
-					posy = (p.y)-r+0.5;
+					posx = (p.x)-r;
+					posy = (p.y)-r;
 								
 					// Create Roi for mask
 					Roi circ = new OvalRoi(posx,posy, r*2, r*2);
@@ -124,8 +121,8 @@ public class MaxInscribedCircles {
 					ip.fill(circ);
 
 					// Original size Roi
-					posx = ((p.x)-r)/2+0.5;
-					posy = ((p.y)-r)/2+0.5;
+					posx = ((p.x)-r)/2.0;
+					posy = ((p.y)-r)/2.0;
 					circ = new OvalRoi(posx,posy, r, r);
 					circ.setStrokeWidth(1);
 
@@ -146,27 +143,27 @@ public class MaxInscribedCircles {
 	
 	}
 	
-	private static ArrayList<Point> getSortedPoints(Polygon points, double minD, final ImageProcessor ip) {
-		ArrayList<Point> hits = new ArrayList<Point>(points.npoints);
-		List<Point> tmpList = new ArrayList<Point>(points.npoints);
+	private static ArrayList<Point2D.Double> getSortedPoints(Polygon points, double minD, final ImageProcessor ip) {
+		ArrayList<Point2D.Double> hits = new ArrayList<Point2D.Double>(points.npoints);
+		List<Point2D.Double> tmpList = new ArrayList<Point2D.Double>(points.npoints);
 		
 		for(int i=0; i<points.npoints; i++) {
 			double r = ip.getInterpolatedValue(points.xpoints[i], points.ypoints[i]);
 			if(r > minD) {
-				hits.add(new Point(points.xpoints[i], points.ypoints[i]));
+				hits.add(new Point2D.Double(points.xpoints[i], points.ypoints[i]));
 			}
 		}
 		
-		Collections.sort(hits, new Comparator<Point>() {
+		Collections.sort(hits, new Comparator<Point2D.Double>() {
 		    @Override
-		    public int compare(Point p1, Point p2) {
+		    public int compare(Point2D.Double p1, Point2D.Double p2) {
 		        return new Double(ip.getInterpolatedValue(p2.x, p2.y)).compareTo(new Double(ip.getInterpolatedValue(p1.x, p1.y)));
 		    }
 		});
 		
 		int ind = 0;
 		for(int i=1; i< hits.size(); i++) {
-			Point p = hits.get(i);
+			Point2D.Double p = hits.get(i);
 			if( ip.getInterpolatedValue(p.x, p.y) < ip.getInterpolatedValue(hits.get(0).x, hits.get(0).y) ) {
 				// We should remove all objects from this index onwards
 				ind = i;
@@ -177,20 +174,20 @@ public class MaxInscribedCircles {
 		if (ind > 0) {
 			tmpList = hits.subList(0, ind);
 		}
-		ArrayList<Point> finalList = new ArrayList<Point>();
+		ArrayList<Point2D.Double> finalList = new ArrayList<Point2D.Double>();
 		finalList.addAll(tmpList);
-		return hits;
+		return finalList;
 	}
 
-	public static ArrayList<Point> findNeighbors(Point p, ArrayList<Point> hits, ImageProcessor ip) {
-		ArrayList<Point> neighbors = new ArrayList<Point>();
+	public static ArrayList<Point2D.Double> findNeighbors(Point2D.Double p, ArrayList<Point2D.Double> hits, ImageProcessor ip) {
+		ArrayList<Point2D.Double> neighbors = new ArrayList<Point2D.Double>();
 		double r = ip.getInterpolatedValue(p.x, p.y);
 
-		for(Point k : hits) {
+		for(Point2D.Double k : hits) {
 			double dist = p.distance(k);
 			double r2 = ip.getInterpolatedValue(k.x, k.y);
 			if (dist < (r+r2)) {
-				neighbors.add(new Point(k));
+				neighbors.add(k);
 			}
 		}		
 		return neighbors;
