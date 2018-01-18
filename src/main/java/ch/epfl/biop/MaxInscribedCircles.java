@@ -1,6 +1,5 @@
 package ch.epfl.biop;
 
-import java.awt.Point;
 import java.awt.Polygon;
 import java.lang.Double;
 import java.awt.geom.Point2D;
