@@ -38,11 +38,13 @@ public class CirclesBasedSpine {
 
     public PolygonRoi getSpine() {
         if (this.circles.isEmpty()) {
+            // If there is no circles, they are computed
             this.circles = MaxInscribedCircles.findCircles(this.imp, (double)this.minCircleDiameter, false);
         }
 
         Roi circle;
         if (this.isShowCircles) {
+            // If isShowCircles they are added to this.ov
             Iterator var2 = this.circles.iterator();
 
             while(var2.hasNext()) {
@@ -51,23 +53,32 @@ public class CirclesBasedSpine {
             }
         }
 
+        // The first circle is the larger
         circle = (Roi)this.circles.get(0);
 
+        // Do not compute spine if there is no adjacent circle
         if (this.getAdjacentCircles(this.circles, circle).size() < 2) {
             IJ.log("Error: No Adjacent Circles found");
             return null;
         }
 
+        // Get the largest circle adjacent to circle
         Roi circleB = (Roi)Collections.max(this.getAdjacentCircles(this.circles, circle), Comparator.comparing((c) -> {
             return c.getFloatWidth();
         }));
+        // A and B are the centroids or circle and circleB
         Point2D pointA = this.getCentroid(circle);
         Point2D pointB = this.getCentroid(circleB);
+        // Add a line to this.ov which link the 2 circles
         this.ov.add(this.makeLine(circle, circleB, new Color(128, 255, 128)));
+        // Iterate the spine (from circle (excluded) using vector B->A)
         List<Point2D> spineB = this.iterateSpine(this.circles, circleB, circle);
+        // Reorder the spine to get extremity -> B -> A
         Collections.reverse(spineB);
         spineB.add(pointA);
         spineB.add(pointB);
+        // Iterate the spine (from circleB excluded using A->B)
+        // and add it to spineB
         spineB.addAll(this.iterateSpine(this.circles, circle, circleB));
         float[] xPoints = this.toFloatArray(spineB.stream().mapToDouble((m) -> {
             return m.getX();
@@ -75,6 +86,7 @@ public class CirclesBasedSpine {
         float[] yPoints = this.toFloatArray(spineB.stream().mapToDouble((m) -> {
             return m.getY();
         }).toArray());
+        // Create a polygon and set name "Spine"
         this.spine = new PolygonRoi(xPoints, yPoints, 6);
         this.spine.setName("Spine");
         return this.spine;
@@ -107,30 +119,43 @@ public class CirclesBasedSpine {
 
         while(!done) {
             circles.remove(circleA);
+            // vectorA is A->B
             Point2D vectorA = this.getVector(circleA, circleB);
             Roi finalCircleB = circleB;
+            // Find a circle adjacent to circleB which is not A
+            // Which is compatible with similarity
             List theCircles = (List)this.getAdjacentCircles(circles, circleB).stream().filter((Roi c) -> {
                 Point2D vectorB = this.getVector(finalCircleB, c);
                 return this.similarity(vectorA, vectorB) > this.minSimilarity;
             }).collect(Collectors.toList());
             if (!theCircles.isEmpty()) {
+                // Write to log all the compatible adjacent circles
                 IJ.log("" + theCircles);
+                // put in circleC the largest
                 Roi circleC = (Roi) Collections.max(theCircles, Comparator.comparing((Roi c) -> c.getFloatWidth()));
+                // Add to this.ov the line which link circleB to circleC
                 Line line = this.makeLine(circleB, circleC, new Color(128, 255, 128));
                 this.ov.add(line);
+                // Add to the spine circleC center
                 spinePoints.add(this.getCentroid(circleC));
                 circles.remove(circleB);
+                // Go one with B-C instead of A-B
                 circleA = circleB;
                 circleB = circleC;
             } else {
+                // No more compatible circle were found
                 done = true;
+                // Make a line to go to the extremity of mask
                 Line line = this.makeEndLine(circleB, vectorA);
+                // add this line to this.ov
                 this.ov.add(line);
+                // add the extremity point to the spinePoints
                 spinePoints.add(new Point2D((double)line.getFloatPolygon().xpoints[2], (double)line.getFloatPolygon().ypoints[2]));
             }
         }
-
+        // set this.ov as overlay
         this.imp.setOverlay(this.ov);
+        // Print in log the spine points (from circleB excluded)
         IJ.log("\n spinepoints " + spinePoints);
         return spinePoints;
     }
@@ -183,15 +208,18 @@ public class CirclesBasedSpine {
     Line makeEndLine(Roi circle, Point2D vector) {
         Point2D c1 = this.getCentroid(circle);
         double r1 = circle.getFloatWidth() / 2.0D;
+        // c2 is the extremity of the circle in the direction of vector
         Point2D c2 = c1.add(new Point2D(r1 * vector.getX() / vector.magnitude(), r1 * vector.getY() / vector.magnitude()));
+        // check it is inMask
         Boolean inMask = this.imp.getProcessor().getf((int)Math.round(c2.getX()), (int)Math.round(c2.getY())) == 255.0F;
-
+        // while it is inMask increase by one pixel in vector direction
         for(int i = 1; inMask; ++i) {
             c2 = c1.add(new Point2D((r1 + (double)i) * vector.getX() / vector.magnitude(), (r1 + (double)i) * vector.getY() / vector.magnitude()));
             inMask = this.imp.getProcessor().getf((int)Math.round(c2.getX()), (int)Math.round(c2.getY())) == 255.0F;
         }
-
+        // create a circle c with centroid c2 radius 10
         Roi c = new OvalRoi(c2.getX() - 10.0D, c2.getY() - 10.0D, 20.0D, 20.0D);
+        // return a line between circle and c
         return this.makeLine(circle, c, new Color(255, 0, 0));
     }
 
