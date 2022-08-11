@@ -59,7 +59,7 @@ public class CirclesBasedSpine {
         // Do not compute spine if there is no adjacent circle
         List<Roi> adjCircles = this.getAdjacentCircles(this.circles, circle, imp);
         if (adjCircles.size() < 1) {
-            IJ.log("Error: No Adjacent Circles found. Consider decrease the minCircleDiameter or increase the closeness Tolerance");
+            IJ.log("Error: No Adjacent Circles found. Consider decreasing 'Minimum Circle Diameter' or increasing 'Closeness Tolerance'");
             return null;
         }
 

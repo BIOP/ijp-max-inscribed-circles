@@ -63,7 +63,17 @@
                 <id>romainGuiet</id>
             </properties>
         </contributor>
-
+        <contributor>
+            <name>Lucille Delisle</name>
+            <url>https://people.epfl.ch/lucille.delisle</url>
+            <roles>
+                <role>debugger</role>
+                <role>reviewer</role>
+            </roles>
+            <properties>
+                <id>lldelisle</id>
+            </properties>
+        </contributor>
     </contributors>
 
     <mailingLists>
