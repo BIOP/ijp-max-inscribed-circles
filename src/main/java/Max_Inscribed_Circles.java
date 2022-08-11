@@ -38,24 +38,42 @@ public class Max_Inscribed_Circles implements PlugIn {
 
         this.showDialog();
         this.setParameters();
+        // First get the inscribed circles:
         ArrayList<Roi> circles = MaxInscribedCircles.findCircles(imp, this.minDiameter, this.isSelectionOnly);
+
+        // Get the current Roi Manager or create a new one
         this.rm = RoiManager.getInstance();
         if (this.rm == null) {
             this.rm = new RoiManager();
         }
-
+        // Display it
         this.rm.setVisible(true);
-        Iterator var5 = circles.iterator();
+
+        // Add the circles to the Roi Manager
+        Iterator<Roi> var5 = circles.iterator();
 
         while(var5.hasNext()) {
             Roi r = (Roi)var5.next();
             this.rm.addRoi(r);
         }
 
-        if (this.isGetSpine) {
-            CirclesBasedSpine sbs = (new CirclesBasedSpine.Settings(imp)).circles(circles).closenessTolerance(this.closenessTolerance).minSimilarity(this.minSimilarity).showCircles(false).build();
+        // Display a message if no circle was found
+        if (circles.size() == 0) {
+            IJ.log("No circles found, consider decreasing 'Minimum Circle Diameter'.");
+        }
 
+        // Display a message if no circle was found
+        if (this.isGetSpine && circles.size() == 1) {
+            IJ.log("A single circle was found. Spine cannot be computed, consider decreasing 'Minimum Circle Diameter'.");
+        }
+
+        // Only get spine if checkbox is ticked and there is at least 2 circles
+        if (this.isGetSpine && circles.size() > 1) {
+            // Define the parameters
+            CirclesBasedSpine sbs = (new CirclesBasedSpine.Settings(imp)).circles(circles).closenessTolerance(this.closenessTolerance).minSimilarity(this.minSimilarity).showCircles(false).build();
+            // Get the spine
             Roi spine = sbs.getSpine();
+            // If one is found rename and add it to the Roi Manager
             if (spine != null) {
                 spine.setName("Spine");
                 this.rm.addRoi(spine);
