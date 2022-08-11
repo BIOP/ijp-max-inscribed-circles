@@ -45,7 +45,7 @@ public class CirclesBasedSpine {
         Roi circle;
         if (this.isShowCircles) {
             // If isShowCircles they are added to this.ov
-            Iterator var2 = this.circles.iterator();
+            Iterator<Roi> var2 = this.circles.iterator();
 
             while(var2.hasNext()) {
                 circle = (Roi)var2.next();
@@ -116,7 +116,7 @@ public class CirclesBasedSpine {
 
     List<Point2D> iterateSpine(List<Roi> circles, Roi circleA, Roi circleB) {
         Boolean done = false;
-        ArrayList spinePoints = new ArrayList();
+        ArrayList<Point2D> spinePoints = new ArrayList<Point2D>();
 
         while(!done) {
             circles.remove(circleA);
@@ -125,7 +125,7 @@ public class CirclesBasedSpine {
             Roi finalCircleB = circleB;
             // Find a circle adjacent to circleB which is not A
             // Which is compatible with similarity
-            List theCircles = (List)this.getAdjacentCircles(circles, circleB, imp).stream().filter((Roi c) -> {
+            List<Roi> theCircles = (List<Roi>)this.getAdjacentCircles(circles, circleB, imp).stream().filter((Roi c) -> {
                 Point2D vectorB = this.getVector(finalCircleB, c);
                 return this.similarity(vectorA, vectorB) > this.minSimilarity;
             }).collect(Collectors.toList());
@@ -183,7 +183,7 @@ public class CirclesBasedSpine {
     List<Roi> getAdjacentCircles(List<Roi> circles, Roi circle, ImagePlus imp) {
         double r0 = circle.getFloatWidth() / 2.0D;
         Point2D c0 = this.getCentroid(circle);
-        List<Roi> adjacent = (List)circles.stream().filter((c) -> {
+        List<Roi> adjacent = (List<Roi>)circles.stream().filter((c) -> {
             double r1 = c.getFloatWidth() / 2.0D;
             Point2D c1 = this.getCentroid(c);
             return c1.distance(c0) < r1 + r0 + this.closenessTolerance && c1.distance(c0) > 0 && this.allLineInMask(c0, c1, imp);
@@ -244,7 +244,7 @@ public class CirclesBasedSpine {
         private Boolean isShowCircles = false;
         private double minSimilarity = 0.5D;
         private double closenessTolerance = 10.0D;
-        private List<Roi> circles = new ArrayList();
+        private List<Roi> circles = new ArrayList<Roi>();
 
         public Settings(ImagePlus image) {
             this.image = image;

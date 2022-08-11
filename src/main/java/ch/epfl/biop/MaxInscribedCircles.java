@@ -29,7 +29,7 @@ public class MaxInscribedCircles {
 
 	public static ArrayList<Roi> findCircles(ImagePlus imp, double minD, boolean isSelectionOnly) {
 		IJ.showStatus("Finding Largest Inscribed Circles based on Distance Map...");
-		ArrayList<Roi> allrois = new ArrayList();
+		ArrayList<Roi> allrois = new ArrayList<Roi>();
 		Roi sel = imp.getRoi();
 		Object ip;
 		int offsetX;
@@ -73,7 +73,7 @@ public class MaxInscribedCircles {
 				double r = dist_map_ip.getInterpolatedValue(p.x, p.y);
 				ArrayList<Double> neigh = findNeighbors(p, hits, dist_map_ip);
 				if (neigh.size() > 1) {
-					Iterator var27 = neigh.iterator();
+					Iterator<Double> var27 = neigh.iterator();
 
 					while(var27.hasNext()) {
 						Double pp = (Double)var27.next();
@@ -110,8 +110,8 @@ public class MaxInscribedCircles {
 	}
 
 	private static ArrayList<Double> getSortedPoints(Polygon points, double minD, final ImageProcessor ip) {
-		ArrayList<Double> hits = new ArrayList(points.npoints);
-		List<Double> tmpList = new ArrayList(points.npoints);
+		ArrayList<Double> hits = new ArrayList<Double>(points.npoints);
+		List<Double> tmpList = new ArrayList<Double>(points.npoints);
 
 		int ind;
 		for(ind = 0; ind < points.npoints; ++ind) {
@@ -136,20 +136,20 @@ public class MaxInscribedCircles {
 			}
 		}
 
-		((List)tmpList).addAll(hits);
+		((List<Double>)tmpList).addAll(hits);
 		if (ind > 0) {
 			tmpList = hits.subList(0, ind);
 		}
 
-		ArrayList<Double> finalList = new ArrayList();
-		finalList.addAll((Collection)tmpList);
+		ArrayList<Double> finalList = new ArrayList<Double>();
+		finalList.addAll((Collection<Double>)tmpList);
 		return finalList;
 	}
 
 	public static ArrayList<Double> findNeighbors(Double p, ArrayList<Double> hits, ImageProcessor ip) {
-		ArrayList<Double> neighbors = new ArrayList();
+		ArrayList<Double> neighbors = new ArrayList<Double>();
 		double r = ip.getInterpolatedValue(p.x, p.y);
-		Iterator var7 = hits.iterator();
+		Iterator<Double> var7 = hits.iterator();
 
 		while(var7.hasNext()) {
 			Double k = (Double)var7.next();

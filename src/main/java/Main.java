@@ -2,7 +2,6 @@ import ij.IJ;
 import ij.ImagePlus;
 import ij.gui.OvalRoi;
 import net.imagej.ImageJ;
-import org.scijava.plugin.Parameter;
 
 public class Main {
 

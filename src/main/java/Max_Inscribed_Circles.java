@@ -50,7 +50,7 @@ public class Max_Inscribed_Circles implements PlugIn {
         this.rm.setVisible(true);
 
         // Add the circles to the Roi Manager
-        Iterator var5 = circles.iterator();
+        Iterator<Roi> var5 = circles.iterator();
 
         while(var5.hasNext()) {
             Roi r = (Roi)var5.next();
