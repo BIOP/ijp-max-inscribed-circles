@@ -57,7 +57,7 @@ public class CirclesBasedSpine {
         circle = (Roi)this.circles.get(0);
 
         // Do not compute spine if there is no adjacent circle
-        List<Roi> adjCircles = this.getAdjacentCircles(this.circles, circle);
+        List<Roi> adjCircles = this.getAdjacentCircles(this.circles, circle, imp);
         if (adjCircles.size() < 2) {
             IJ.log("Error: No Adjacent Circles found");
             return null;
@@ -125,7 +125,7 @@ public class CirclesBasedSpine {
             Roi finalCircleB = circleB;
             // Find a circle adjacent to circleB which is not A
             // Which is compatible with similarity
-            List theCircles = (List)this.getAdjacentCircles(circles, circleB).stream().filter((Roi c) -> {
+            List theCircles = (List)this.getAdjacentCircles(circles, circleB, imp).stream().filter((Roi c) -> {
                 Point2D vectorB = this.getVector(finalCircleB, c);
                 return this.similarity(vectorA, vectorB) > this.minSimilarity;
             }).collect(Collectors.toList());
@@ -180,13 +180,13 @@ public class CirclesBasedSpine {
         return nRoi;
     }
 
-    List<Roi> getAdjacentCircles(List<Roi> circles, Roi circle) {
+    List<Roi> getAdjacentCircles(List<Roi> circles, Roi circle, ImagePlus imp) {
         double r0 = circle.getFloatWidth() / 2.0D;
         Point2D c0 = this.getCentroid(circle);
         List<Roi> adjacent = (List)circles.stream().filter((c) -> {
             double r1 = c.getFloatWidth() / 2.0D;
             Point2D c1 = this.getCentroid(c);
-            return c1.distance(c0) < r1 + r0 + this.closenessTolerance && c1.distance(c0) > 0;
+            return c1.distance(c0) < r1 + r0 + this.closenessTolerance && c1.distance(c0) > 0 && this.allLineInMask(c0, c1, imp);
         }).collect(Collectors.toList());
         return adjacent;
     }
@@ -226,6 +226,16 @@ public class CirclesBasedSpine {
 
     double similarity(Point2D p1, Point2D p2) {
         return (p1.getX() * p2.getX() + p1.getY() * p2.getY()) / (Math.sqrt(p1.getX() * p1.getX() + p1.getY() * p1.getY()) * Math.sqrt(p2.getX() * p2.getX() + p2.getY() * p2.getY()));
+    }
+
+    boolean allLineInMask(Point2D c0, Point2D c1, ImagePlus imp) {
+        double[] values = imp.getProcessor().getLine​(c0.getX(), c0.getY(), c1.getX(), c1.getY());
+        for (int i = 0; i < values.length; ++i) {
+            if (values[i] != 255.0F) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public static class Settings {
