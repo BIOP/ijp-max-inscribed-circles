@@ -185,7 +185,7 @@ public class CirclesBasedSpine {
         List<Roi> adjacent = (List)circles.stream().filter((c) -> {
             double r1 = c.getFloatWidth() / 2.0D;
             Point2D c1 = this.getCentroid(c);
-            return c1.distance(c0) < r1 + r0 + this.closenessTolerance && c1.distance(c0) > r1 + r0 - this.closenessTolerance;
+            return c1.distance(c0) < r1 + r0 + this.closenessTolerance && c1.distance(c0) > 0;
         }).collect(Collectors.toList());
         return adjacent;
     }
