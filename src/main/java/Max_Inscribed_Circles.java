@@ -57,7 +57,13 @@ public class Max_Inscribed_Circles implements PlugIn {
             this.rm.addRoi(r);
         }
 
-        if (this.isGetSpine) {
+        // Display a message if no circle was found
+        if (circles.size() == 0) {
+            IJ.log("No circle found, consider increasing the minimum diameter.");
+        }
+
+        // Only get spine if checkbox is ticked and there is at least one circle
+        if (this.isGetSpine && circles.size() > 0) {
             // Define the parameters
             CirclesBasedSpine sbs = (new CirclesBasedSpine.Settings(imp)).circles(circles).closenessTolerance(this.closenessTolerance).minSimilarity(this.minSimilarity).showCircles(false).build();
             // Get the spine
