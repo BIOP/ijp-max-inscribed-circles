@@ -57,13 +57,14 @@ public class CirclesBasedSpine {
         circle = (Roi)this.circles.get(0);
 
         // Do not compute spine if there is no adjacent circle
-        if (this.getAdjacentCircles(this.circles, circle).size() < 2) {
+        List<Roi> adjCircles = this.getAdjacentCircles(this.circles, circle);
+        if (adjCircles.size() < 2) {
             IJ.log("Error: No Adjacent Circles found");
             return null;
         }
 
         // Get the largest circle adjacent to circle
-        Roi circleB = (Roi)Collections.max(this.getAdjacentCircles(this.circles, circle), Comparator.comparing((c) -> {
+        Roi circleB = (Roi)Collections.max(adjCircles, Comparator.comparing((c) -> {
             return c.getFloatWidth();
         }));
         // A and B are the centroids or circle and circleB
