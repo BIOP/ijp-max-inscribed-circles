@@ -130,8 +130,6 @@ public class CirclesBasedSpine {
                 return this.similarity(vectorA, vectorB) > this.minSimilarity;
             }).collect(Collectors.toList());
             if (!theCircles.isEmpty()) {
-                // Write to log all the compatible adjacent circles
-                IJ.log("" + theCircles);
                 // put in circleC the largest
                 Roi circleC = (Roi) Collections.max(theCircles, Comparator.comparing((Roi c) -> c.getFloatWidth()));
                 // Add to this.ov the line which link circleB to circleC
@@ -156,8 +154,6 @@ public class CirclesBasedSpine {
         }
         // set this.ov as overlay
         this.imp.setOverlay(this.ov);
-        // Print in log the spine points (from circleB excluded)
-        IJ.log("\n spinepoints " + spinePoints);
         return spinePoints;
     }
 
