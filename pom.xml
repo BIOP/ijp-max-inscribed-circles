@@ -91,7 +91,7 @@
         <system>None</system>
     </ciManagement>
     <scm>
-        <connection>https://github.com/BIOP/ijp-max-inscribed-circles.git</connection>
+        <connection>https://github.com/BIOP/ijp-max-inscribed-circles</connection>
         <tag>HEAD</tag>
         <url>https://github.com/BIOP/ijp-max-inscribed-circles</url>
         <developerConnection>oburri</developerConnection>
