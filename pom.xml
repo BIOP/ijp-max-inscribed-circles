@@ -103,6 +103,7 @@
         <scijava.app.directory>C:/Fiji</scijava.app.directory>
         <delete.other.versions>true</delete.other.versions>
         <fiji.fiji-plugins.version>20101208</fiji.fiji-plugins.version>
+        <releaseProfiles>sign,deploy-to-scijava</releaseProfiles>
     </properties>
 
     <dependencies>
