@@ -15,7 +15,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
-import javafx.geometry.Point2D;
+import java.awt.geom.Point2D;
 
 public class CirclesBasedSpine {
     private Overlay ov = new Overlay();
@@ -95,7 +95,7 @@ public class CirclesBasedSpine {
 
     private Point2D getCentroid(Roi circle) {
         double[] c = circle.getContourCentroid();
-        Point2D centroid = new Point2D(c[0], c[1]);
+        Point2D centroid = new Point2D.Double(c[0], c[1]);
         return centroid;
     }
 
@@ -149,7 +149,7 @@ public class CirclesBasedSpine {
                 // add this line to this.ov
                 this.ov.add(line);
                 // add the extremity point to the spinePoints
-                spinePoints.add(new Point2D((double)line.getFloatPolygon().xpoints[2], (double)line.getFloatPolygon().ypoints[2]));
+                spinePoints.add(new Point2D.Double((double)line.getFloatPolygon().xpoints[2], (double)line.getFloatPolygon().ypoints[2]));
             }
         }
         // set this.ov as overlay
@@ -190,7 +190,9 @@ public class CirclesBasedSpine {
     Point2D getVector(Roi circleA, Roi circleB) {
         Point2D A = this.getCentroid(circleA);
         Point2D B = this.getCentroid(circleB);
-        return B.subtract(A);
+
+        Point2D.Double C = new Point2D.Double(B.getX() - A.getX(), B.getY() - A.getY());
+        return C;
     }
 
     Line makeLine(Roi circleA, Roi circleB, Color color) {
@@ -205,13 +207,21 @@ public class CirclesBasedSpine {
     Line makeEndLine(Roi circle, Point2D vector) {
         Point2D c1 = this.getCentroid(circle);
         double r1 = circle.getFloatWidth() / 2.0D;
+
         // c2 is the extremity of the circle in the direction of vector
-        Point2D c2 = c1.add(new Point2D(r1 * vector.getX() / vector.magnitude(), r1 * vector.getY() / vector.magnitude()));
+        double magnitude = vector.distance(0,0);
+
+        Point2D c2 = new Point2D.Double(c1.getX() + r1 * vector.getX() / magnitude, c1.getY() + r1 * vector.getY() / magnitude );
+
+        // Double check that the above is the same as below
+        //Point2D c2 = c1.add(new Point2D(r1 * vector.getX() / vector.magnitude(), r1 * vector.getY() / vector.magnitude()));
+
         // check it is inMask
         Boolean inMask = this.imp.getProcessor().getf((int)Math.round(c2.getX()), (int)Math.round(c2.getY())) == 255.0F;
         // while it is inMask increase by one pixel in vector direction
         for(int i = 1; inMask; ++i) {
-            c2 = c1.add(new Point2D((r1 + (double)i) * vector.getX() / vector.magnitude(), (r1 + (double)i) * vector.getY() / vector.magnitude()));
+            c2 = new Point2D.Double(c1.getX() + ( r1 + (double) i ) * vector.getX() / magnitude, c1.getY() + (r1 +(double) i) * vector.getY() / magnitude );
+            //c2 = c1.add(new Point2D((r1 + (double)i) * vector.getX() / vector.magnitude(), (r1 + (double)i) * vector.getY() / vector.magnitude()));
             inMask = this.imp.getProcessor().getf((int)Math.round(c2.getX()), (int)Math.round(c2.getY())) == 255.0F;
         }
         // create a circle c with centroid c2 radius 10
@@ -225,7 +235,7 @@ public class CirclesBasedSpine {
     }
 
     boolean allLineInMask(Point2D c0, Point2D c1, ImagePlus imp) {
-        double[] values = imp.getProcessor().getLine​(c0.getX(), c0.getY(), c1.getX(), c1.getY());
+        double[] values = imp.getProcessor().getLine(c0.getX(), c0.getY(), c1.getX(), c1.getY());
         for (int i = 0; i < values.length; ++i) {
             if (values[i] != 255.0F) {
                 return false;
