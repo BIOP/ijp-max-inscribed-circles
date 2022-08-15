@@ -30,10 +30,9 @@
         </license>
     </licenses>
     <repositories>
-        <!-- NB: for project parent -->
         <repository>
-            <id>imagej.public</id>
-            <url>http://maven.imagej.net/content/groups/public</url>
+            <id>scijava.public</id>
+            <url>https://maven.scijava.org/content/groups/public</url>
         </repository>
     </repositories>
     <developers>
@@ -94,7 +93,7 @@
         <connection>https://github.com/BIOP/ijp-max-inscribed-circles</connection>
         <tag>HEAD</tag>
         <url>https://github.com/BIOP/ijp-max-inscribed-circles</url>
-        <developerConnection>oburri</developerConnection>
+        <developerConnection>lacan</developerConnection>
     </scm>
 
     <properties>
@@ -105,13 +104,14 @@
         <scijava.app.subdirectory>plugins/BIOP</scijava.app.subdirectory>
         <scijava.app.directory>C:/Fiji</scijava.app.directory>
         <delete.other.versions>true</delete.other.versions>
+        <fiji.fiji-plugins.version>20101208</fiji.fiji-plugins.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>fiji</groupId>
             <artifactId>fiji-plugins</artifactId>
-            <version>20101208</version>
+            <version>${fiji.fiji-plugins.version}</version>
         </dependency>
         <dependency>
             <groupId>net.imagej</groupId>
