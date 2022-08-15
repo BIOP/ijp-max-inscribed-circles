@@ -99,7 +99,7 @@
     <properties>
         <package-name>ch.epfl.biop</package-name>
         <main-class>Max_Inscribed_Circles</main-class>
-        <license.licenseName>GPL3</license.licenseName>
+        <license.licenseName>gpl_v3</license.licenseName>
         <license.copyrightOwners>EPFL</license.copyrightOwners>
         <scijava.app.subdirectory>plugins/BIOP</scijava.app.subdirectory>
         <scijava.app.directory>C:/Fiji</scijava.app.directory>
