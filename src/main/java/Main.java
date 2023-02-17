@@ -2,7 +2,7 @@
  * #%L
  * Mavenized Improved fit largest circle plugin
  * %%
- * Copyright (C) 2015 - 2022 EPFL
+ * Copyright (C) 2015 - 2023 EPFL
  * %%
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
