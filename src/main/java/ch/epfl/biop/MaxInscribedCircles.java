@@ -50,18 +50,29 @@ public class MaxInscribedCircles {
 	private boolean useSelectionOnly;
 	private boolean appendPositionToName;
 
-	private List<Roi> circles = new ArrayList<>();
-	private List<Roi> spines = new ArrayList<>();
-
-	private List<Roi> spineParts = new ArrayList<>();
+	private List<Roi> circles;
+	private List<Roi> spines;
+	private List<Roi> spineParts;
 	MaxInscribedCircles() {
 	}
 
+	/**
+	 * Calling the Circle Finder using a Builder Pattern
+	 * @param imp the ImagePlus (can be a stack) to process
+	 * @return the builder
+	 */
 	public static Builder builder(ImagePlus imp) {
 		return new Builder(imp);
 	}
 
+	/**
+	 * Perform the circle and spine finding
+	 */
 	public void process() {
+
+		circles = new ArrayList<>();
+		spines = new ArrayList<>();
+		spineParts = new ArrayList<>();
 
 		int nSlices = imp.getStackSize();
 
@@ -123,12 +134,25 @@ public class MaxInscribedCircles {
 		}
 	}
 
+	/**
+	 * Get the circles found after process()
+	 * @return a list of circles that were found
+	 */
 	public List<Roi> getCircles() {
 		return circles;
 	}
+	/**
+	 * Get the spines found after process()
+	 * @return the spine or spines found if it's a stack
+	 */
 	public List<Roi> getSpines() {
 		return spines;
 	}
+	/**
+	 * Get the spine parts found after process()
+	 * This is purely for aesthetic reasons
+	 * @return the spine or spine parts (colored segments) if it's a stack. It's a spine broken into pieces.
+	 */
 	public List<Roi> getSpineParts() {
 		return spineParts;
 	}

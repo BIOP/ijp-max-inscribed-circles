@@ -24,7 +24,6 @@
 // (powered by FernFlower decompiler)
 //
 
-import ch.epfl.biop.CirclesBasedSpine;
 import ch.epfl.biop.MaxInscribedCircles;
 import ij.IJ;
 import net.imagej.ImageJ;
@@ -39,8 +38,6 @@ import ij.plugin.frame.RoiManager;
 import java.util.List;
 
 public class Max_Inscribed_Circles implements PlugIn {
-    private static final String PREFIX = "biop.max.inscribed.";
-    private RoiManager rm;
     private boolean isSelectionOnly;
     private boolean isGetSpine;
     private double minSimilarity = 0.5D;
@@ -63,12 +60,12 @@ public class Max_Inscribed_Circles implements PlugIn {
         this.setParameters();
 
         // Get the current Roi Manager or create a new one
-        this.rm = RoiManager.getInstance();
-        if (this.rm == null) {
-            this.rm = new RoiManager();
+        RoiManager rm = RoiManager.getInstance();
+        if (rm == null) {
+            rm = new RoiManager();
         }
         // Display it
-        this.rm.setVisible(true);
+        rm.setVisible(true);
 
 
         Overlay finalOverlay = new Overlay();
@@ -149,11 +146,6 @@ public class Max_Inscribed_Circles implements PlugIn {
     }
 
     public static void main(String[] args) {
-        //Class<?> clazz = Max_Inscribed_Circles.class;
-        //String url = clazz.getResource("/" + clazz.getName().replace('.', '/') + ".class").toString();
-        //String pluginsDir = url.substring(5, url.length() - clazz.getName().length() - 6);
-        //System.setProperty("plugins.dir", pluginsDir);
-       // new ImageJ();
         ImageJ ij = new ImageJ();
         ij.ui().showUI();
         ImagePlus imp = IJ.createImage("Untitled", "8-bit black", 256, 256, 1);
