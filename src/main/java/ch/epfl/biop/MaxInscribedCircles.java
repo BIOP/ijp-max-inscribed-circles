@@ -302,7 +302,7 @@ public class MaxInscribedCircles {
 		/**
 		 * Set the minimum diameter in pixels of the circles to be found
 		 *
-		 * @param minimumDiameter smallest diameter in pixels of circles to be found. Can be very slow if < 10 pixels
+		 * @param minimumDiameter smallest diameter in pixels of circles to be found. Can be very slow if &lt; 10 pixels
 		 * @return this builder
 		 */
 		public Builder minimumDiameter(double minimumDiameter) {
@@ -364,7 +364,7 @@ public class MaxInscribedCircles {
 		/**
 		 * working from the largest circle, the closeness and similarity values, compute a spine going through the circles
 		 *
-		 * @param getSpine wether to return a circles based spine
+		 * @param getSpine whether to return a circles based spine
 		 * @return this builder
 		 */
 		public Builder getSpine(boolean getSpine) {
