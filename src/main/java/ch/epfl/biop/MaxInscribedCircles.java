@@ -39,7 +39,6 @@ import ij.process.ImageProcessor;
 import java.awt.Polygon;
 import java.awt.geom.Point2D.Double;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class MaxInscribedCircles {
 
@@ -51,6 +50,10 @@ public class MaxInscribedCircles {
 	private boolean useSelectionOnly;
 	private boolean appendPositionToName;
 
+	private List<Roi> circles = new ArrayList<>();
+	private List<Roi> spines = new ArrayList<>();
+
+	private List<Roi> spineParts = new ArrayList<>();
 	MaxInscribedCircles() {
 	}
 
@@ -58,8 +61,7 @@ public class MaxInscribedCircles {
 		return new Builder(imp);
 	}
 
-	public List<Roi> process() {
-		Overlay finalOverlay = new Overlay();
+	public void process() {
 
 		int nSlices = imp.getStackSize();
 
@@ -78,13 +80,14 @@ public class MaxInscribedCircles {
 			for (Roi r : circles) {
 				r.setPosition(i);
 				if (appendPositionToName) r.setName(r.getName() + "-P_" + i);
-				finalOverlay.add(r);
 			}
 
 			// Display a message if no circle was found
 			if (circles.size() == 0) {
 				IJ.log("No circles found, consider decreasing 'Minimum Circle Diameter'.");
 			}
+
+			this.circles.addAll(circles);
 
 			// Display a message if no circle was found
 			if (getSpine && circles.size() == 1) {
@@ -97,28 +100,37 @@ public class MaxInscribedCircles {
 				CirclesBasedSpine sbs = (new CirclesBasedSpine.Settings(tmpImp)).circles(circles).closenessTolerance(spineClosenessTolerance).minSimilarity(spineMinimumSimilarity).showCircles(false).build();
 				// Get the spine
 				Roi spine = sbs.getSpine();
+
 				// If one is found rename and add it to the Roi Manager
 				if (spine != null) {
 					spine.setPosition(i);
 					if (appendPositionToName) spine.setName(spine.getName() + "-P_" + i);
-					finalOverlay.add(spine);
 
 					// Get the overlay and add it back as well
 					Overlay ov = tmpImp.getOverlay();
 					for (Roi r : ov) {
 						if (appendPositionToName) r.setName(r.getName() + "-P_" + i);
 						r.setPosition(i);
-						finalOverlay.add(r);
+						this.spineParts.add(r);
 					}
+
+					this.spines.add(spine);
+
 				} else {
 					IJ.log("No spine found");
 				}
 			}
 		}
-		//imp.setOverlay(finalOverlay);
+	}
 
-		// Convert the overlay to a list
-		return Arrays.stream(finalOverlay.toArray()).collect(Collectors.toList());
+	public List<Roi> getCircles() {
+		return circles;
+	}
+	public List<Roi> getSpines() {
+		return spines;
+	}
+	public List<Roi> getSpineParts() {
+		return spineParts;
 	}
 
 	public static List<Roi> findCircles(ImagePlus imp, double minD, boolean isSelectionOnly) {

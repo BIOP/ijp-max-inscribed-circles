@@ -82,13 +82,25 @@ public class Max_Inscribed_Circles implements PlugIn {
                 .appendPositionToName(this.appendPositionToName)
                 .build();
 
-        List<Roi> allElements = mic.process();
+        mic.process();
+
+        List<Roi> rois = mic.getCircles();
+        List<Roi> spines = mic.getSpines();
+        List<Roi> spineParts = mic.getSpineParts();
+
+        for (Roi roi : rois) {
+            rm.addRoi(roi);
+        }
+
+        for (Roi roi : spines) {
+            rm.addRoi(roi);
+        }
 
         // the SpinePart rois are just for show. add them, to the overlay
-        for ( Roi roi: allElements ) {
-            if( roi.getName() != null && roi.getName().contains("SpinePart"))  finalOverlay.add( roi );
-            else rm.addRoi( roi );
+        for ( Roi roi: spineParts ) {
+            finalOverlay.add(roi);
         }
+
         imp.setOverlay(finalOverlay);
     }
 
