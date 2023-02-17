@@ -45,8 +45,8 @@ public class MaxInscribedCircles {
 
 	private ImagePlus imp;
 	private double minimumDiameter;
-	private double closenessTolerance;
-	private double minimumSimilarity;
+	private double spineClosenessTolerance;
+	private double spineMinimumSimilarity;
 	private boolean getSpine;
 	private boolean useSelectionOnly;
 	private boolean appendPositionToName;
@@ -58,7 +58,7 @@ public class MaxInscribedCircles {
 		return new Builder(imp);
 	}
 
-	public List<Roi> findCircles() {
+	public List<Roi> process() {
 		Overlay finalOverlay = new Overlay();
 
 		int nSlices = imp.getStackSize();
@@ -66,11 +66,12 @@ public class MaxInscribedCircles {
 		// Process stack only if it's not "selectiononly, otherwise process current slice only
 		int start = useSelectionOnly ? imp.getCurrentSlice() : 1;
 		int end = useSelectionOnly ? imp.getCurrentSlice() : nSlices;
-
+		Roi roi = useSelectionOnly ?imp.getRoi() : null;
 
 		for (int i = start; i <= end; i++) {
 			IJ.log("Processing Slice " + i + " of " + nSlices);
 			ImagePlus tmpImp = new ImagePlus(imp.getTitle() + " - Slice " + i, imp.getStack().getProcessor(i));
+			tmpImp.setRoi(roi);
 			List<Roi> circles = MaxInscribedCircles.findCircles(tmpImp, minimumDiameter, useSelectionOnly);
 
 			// Add the position of the stack
@@ -93,7 +94,7 @@ public class MaxInscribedCircles {
 			// Only get spine if checkbox is ticked and there is at least 2 circles
 			if (getSpine && circles.size() > 1) {
 				// Define the parameters
-				CirclesBasedSpine sbs = (new CirclesBasedSpine.Settings(tmpImp)).circles(circles).closenessTolerance(closenessTolerance).minSimilarity(minimumSimilarity).showCircles(false).build();
+				CirclesBasedSpine sbs = (new CirclesBasedSpine.Settings(tmpImp)).circles(circles).closenessTolerance(spineClosenessTolerance).minSimilarity(spineMinimumSimilarity).showCircles(false).build();
 				// Get the spine
 				Roi spine = sbs.getSpine();
 				// If one is found rename and add it to the Roi Manager
@@ -104,9 +105,10 @@ public class MaxInscribedCircles {
 
 					// Get the overlay and add it back as well
 					Overlay ov = tmpImp.getOverlay();
-					for (Roi roi : ov) {
-						roi.setPosition(i);
-						finalOverlay.add(roi);
+					for (Roi r : ov) {
+						if (appendPositionToName) r.setName(r.getName() + "-P_" + i);
+						r.setPosition(i);
+						finalOverlay.add(r);
 					}
 				} else {
 					IJ.log("No spine found");
@@ -250,8 +252,8 @@ public class MaxInscribedCircles {
 	public static class Builder {
 		private final ImagePlus imp;
 		private double minimumDiameter = 10;
-		private double closenessTolerance = 10;
-		private double minimumSimilarity = 0.5;
+		private double spineClosenessTolerance = 10;
+		private double spineMinimumSimilarity = 0.5;
 		private boolean useSelectionOnly = false;
 		private boolean getSpine = false;
 
@@ -305,10 +307,10 @@ public class MaxInscribedCircles {
 		 * @param closenessTolerance The closeness tolerance in pixels of the circles to be found
 		 * @return this builder
 		 */
-		public Builder closenessTolerance(double closenessTolerance) {
+		public Builder spineClosenessTolerance(double closenessTolerance) {
 			if (closenessTolerance < 1)
 				throw new IllegalArgumentException("Closeness tolerance must be larger than 1 pixel");
-			this.closenessTolerance = closenessTolerance;
+			this.spineClosenessTolerance = closenessTolerance;
 			return this;
 		}
 
@@ -318,8 +320,8 @@ public class MaxInscribedCircles {
 		 * @param minimumSimilarity minimum cosine similarity (0 to 1)
 		 * @return this builder
 		 */
-		public Builder minimumSimilarity(double minimumSimilarity) {
-			this.minimumSimilarity = minimumSimilarity;
+		public Builder spineMinimumSimilarity(double minimumSimilarity) {
+			this.spineMinimumSimilarity = minimumSimilarity;
 			return this;
 		}
 
@@ -338,8 +340,8 @@ public class MaxInscribedCircles {
 			MaxInscribedCircles mic = new MaxInscribedCircles();
 			mic.imp = this.imp;
 			mic.minimumDiameter = this.minimumDiameter;
-			mic.closenessTolerance = this.closenessTolerance;
-			mic.minimumSimilarity = this.minimumSimilarity;
+			mic.spineClosenessTolerance = this.spineClosenessTolerance;
+			mic.spineMinimumSimilarity = this.spineMinimumSimilarity;
 			mic.getSpine = this.getSpine;
 			mic.useSelectionOnly = this.useSelectionOnly;
 			mic.appendPositionToName = this.appendPositionToName;

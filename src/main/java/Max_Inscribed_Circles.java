@@ -27,7 +27,6 @@
 import ch.epfl.biop.CirclesBasedSpine;
 import ch.epfl.biop.MaxInscribedCircles;
 import ij.IJ;
-//import ij.ImageJ;
 import net.imagej.ImageJ;
 import ij.ImagePlus;
 import ij.Prefs;
@@ -37,7 +36,6 @@ import ij.gui.Overlay;
 import ij.gui.Roi;
 import ij.plugin.PlugIn;
 import ij.plugin.frame.RoiManager;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Max_Inscribed_Circles implements PlugIn {
@@ -79,15 +77,16 @@ public class Max_Inscribed_Circles implements PlugIn {
                 .minimumDiameter(this.minDiameter)
                 .useSelectionOnly(this.isSelectionOnly)
                 .getSpine(this.isGetSpine)
-                .closenessTolerance(this.closenessTolerance)
-                .minimumSimilarity(this.minSimilarity)
+                .spineClosenessTolerance(this.closenessTolerance)
+                .spineMinimumSimilarity(this.minSimilarity)
                 .appendPositionToName(this.appendPositionToName)
                 .build();
 
-        List<Roi> allElements = mic.findCircles();
+        List<Roi> allElements = mic.process();
 
+        // the SpinePart rois are just for show. add them, to the overlay
         for ( Roi roi: allElements ) {
-            if( roi.getName() != null && roi.getName().contains("Spine"))  finalOverlay.add( roi );
+            if( roi.getName() != null && roi.getName().contains("SpinePart"))  finalOverlay.add( roi );
             else rm.addRoi( roi );
         }
         imp.setOverlay(finalOverlay);
