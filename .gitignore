@@ -6,6 +6,5 @@
 /target/
 .vscode
 /.idea/
-/.idea/
 *.releaseBackup
 *.iml
