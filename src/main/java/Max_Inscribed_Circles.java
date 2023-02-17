@@ -24,28 +24,27 @@
 // (powered by FernFlower decompiler)
 //
 
-import ch.epfl.biop.CirclesBasedSpine;
 import ch.epfl.biop.MaxInscribedCircles;
 import ij.IJ;
-import ij.ImageJ;
+import net.imagej.ImageJ;
 import ij.ImagePlus;
 import ij.Prefs;
 import ij.gui.GenericDialog;
 import ij.gui.OvalRoi;
+import ij.gui.Overlay;
 import ij.gui.Roi;
 import ij.plugin.PlugIn;
 import ij.plugin.frame.RoiManager;
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.List;
 
 public class Max_Inscribed_Circles implements PlugIn {
-    private static final String PREFIX = "biop.max.inscribed.";
-    private RoiManager rm;
     private boolean isSelectionOnly;
     private boolean isGetSpine;
     private double minSimilarity = 0.5D;
     private double closenessTolerance = 10.0D;
     private double minDiameter;
+
+    private boolean appendPositionToName = false;
 
     public Max_Inscribed_Circles() {
     }
@@ -59,61 +58,61 @@ public class Max_Inscribed_Circles implements PlugIn {
 
         this.showDialog();
         this.setParameters();
-        // First get the inscribed circles:
-        ArrayList<Roi> circles = MaxInscribedCircles.findCircles(imp, this.minDiameter, this.isSelectionOnly);
 
         // Get the current Roi Manager or create a new one
-        this.rm = RoiManager.getInstance();
-        if (this.rm == null) {
-            this.rm = new RoiManager();
+        RoiManager rm = RoiManager.getInstance();
+        if (rm == null) {
+            rm = new RoiManager();
         }
         // Display it
-        this.rm.setVisible(true);
+        rm.setVisible(true);
 
-        // Add the circles to the Roi Manager
-        Iterator<Roi> var5 = circles.iterator();
 
-        while(var5.hasNext()) {
-            Roi r = (Roi)var5.next();
-            this.rm.addRoi(r);
+        Overlay finalOverlay = new Overlay();
+
+        MaxInscribedCircles mic = MaxInscribedCircles.builder(imp)
+                .minimumDiameter(this.minDiameter)
+                .useSelectionOnly(this.isSelectionOnly)
+                .getSpine(this.isGetSpine)
+                .spineClosenessTolerance(this.closenessTolerance)
+                .spineMinimumSimilarity(this.minSimilarity)
+                .appendPositionToName(this.appendPositionToName)
+                .build();
+
+        mic.process();
+
+        List<Roi> rois = mic.getCircles();
+        List<Roi> spines = mic.getSpines();
+        List<Roi> spineParts = mic.getSpineParts();
+
+        for (Roi roi : rois) {
+            rm.addRoi(roi);
         }
 
-        // Display a message if no circle was found
-        if (circles.size() == 0) {
-            IJ.log("No circles found, consider decreasing 'Minimum Circle Diameter'.");
+        for (Roi roi : spines) {
+            rm.addRoi(roi);
         }
 
-        // Display a message if no circle was found
-        if (this.isGetSpine && circles.size() == 1) {
-            IJ.log("A single circle was found. Spine cannot be computed, consider decreasing 'Minimum Circle Diameter'.");
+        // the SpinePart rois are just for show. add them, to the overlay
+        for ( Roi roi: spineParts ) {
+            finalOverlay.add(roi);
         }
 
-        // Only get spine if checkbox is ticked and there is at least 2 circles
-        if (this.isGetSpine && circles.size() > 1) {
-            // Define the parameters
-            CirclesBasedSpine sbs = (new CirclesBasedSpine.Settings(imp)).circles(circles).closenessTolerance(this.closenessTolerance).minSimilarity(this.minSimilarity).showCircles(false).build();
-            // Get the spine
-            Roi spine = sbs.getSpine();
-            // If one is found rename and add it to the Roi Manager
-            if (spine != null) {
-                spine.setName("Spine");
-                this.rm.addRoi(spine);
-            } else {
-                IJ.log("No spine found");
-            }
-        }
-
+        imp.setOverlay(finalOverlay);
     }
 
     private void showDialog() {
         GenericDialog gd = new GenericDialog("Find Largest Circles");
-        gd.addNumericField("Minimum Disk Diameter (px)", this.minDiameter, 1);
+        gd.addNumericField("Minimum_Disk Diameter (px)", this.minDiameter, 1);
         gd.addMessage("Set to 0 to get only the largest inscribed circle");
         gd.addCheckbox("Use selection instead of mask", this.isSelectionOnly);
         gd.addCheckbox("Get Spine", this.isGetSpine);
         gd.addMessage("Spine Detection Settings");
-        gd.addNumericField("Minimum Similarity", 0.5D, 2);
+        gd.addNumericField("Minimum_Similarity", 0.5D, 2);
         gd.addNumericField("Closeness Tolerance", 5.0D, 0);
+
+        gd.addCheckbox("Append Position to ROI Name", this.appendPositionToName);
+
         gd.showDialog();
         if (!gd.wasCanceled()) {
             this.minDiameter = gd.getNextNumber();
@@ -121,6 +120,8 @@ public class Max_Inscribed_Circles implements PlugIn {
             this.isGetSpine = gd.getNextBoolean();
             this.minSimilarity = gd.getNextNumber();
             this.closenessTolerance = gd.getNextNumber();
+
+            this.appendPositionToName = gd.getNextBoolean();
         }
     }
 
@@ -130,6 +131,8 @@ public class Max_Inscribed_Circles implements PlugIn {
         this.isGetSpine = Prefs.get("biop.max.inscribed.isGetSpine", this.isGetSpine);
         this.minSimilarity = Prefs.get("biop.max.inscribed.minSimilarity", this.minSimilarity);
         this.closenessTolerance = Prefs.get("biop.max.inscribed.closenessTolerance", this.closenessTolerance);
+        this.appendPositionToName = Prefs.get("biop.max.inscribed.isAddName", this.appendPositionToName);
+
     }
 
     private void setParameters() {
@@ -138,14 +141,13 @@ public class Max_Inscribed_Circles implements PlugIn {
         Prefs.set("biop.max.inscribed.isGetSpine", this.isGetSpine);
         Prefs.set("biop.max.inscribed.minSimilarity", this.minSimilarity);
         Prefs.set("biop.max.inscribed.closenessTolerance", this.closenessTolerance);
+        Prefs.set("biop.max.inscribed.isAddName", this.appendPositionToName);
+
     }
 
     public static void main(String[] args) {
-        Class<?> clazz = Max_Inscribed_Circles.class;
-        String url = clazz.getResource("/" + clazz.getName().replace('.', '/') + ".class").toString();
-        String pluginsDir = url.substring(5, url.length() - clazz.getName().length() - 6);
-        System.setProperty("plugins.dir", pluginsDir);
-        new ImageJ();
+        ImageJ ij = new ImageJ();
+        ij.ui().showUI();
         ImagePlus imp = IJ.createImage("Untitled", "8-bit black", 256, 256, 1);
         imp.setRoi(45, 59, 70, 88);
         IJ.setForegroundColor(255, 255, 255);

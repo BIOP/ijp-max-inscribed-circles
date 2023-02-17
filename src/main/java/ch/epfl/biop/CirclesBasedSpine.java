@@ -39,6 +39,7 @@ import java.util.stream.Collectors;
 import java.awt.geom.Point2D;
 
 public class CirclesBasedSpine {
+    // create builder pattern
     private Overlay ov = new Overlay();
     private ImagePlus imp;
     private int minCircleDiameter;
@@ -60,22 +61,22 @@ public class CirclesBasedSpine {
     public PolygonRoi getSpine() {
         if (this.circles.isEmpty()) {
             // If there is no circles, they are computed
-            this.circles = MaxInscribedCircles.findCircles(this.imp, (double)this.minCircleDiameter, false);
+            this.circles = MaxInscribedCircles.findCircles(this.imp, this.minCircleDiameter, false);
         }
 
         Roi circle;
         if (this.isShowCircles) {
             // If isShowCircles they are added to this.ov
-            Iterator<Roi> var2 = this.circles.iterator();
+            Iterator<Roi> it = this.circles.iterator();
 
-            while(var2.hasNext()) {
-                circle = (Roi)var2.next();
+            while(it.hasNext()) {
+                circle = it.next();
                 this.ov.add(circle);
             }
         }
 
-        // The first circle is the larger
-        circle = (Roi)this.circles.get(0);
+        // The first circle is the largest
+        circle = this.circles.get(0);
 
         // Do not compute spine if there is no adjacent circle
         List<Roi> adjCircles = this.getAdjacentCircles(this.circles, circle, imp);
@@ -85,9 +86,8 @@ public class CirclesBasedSpine {
         }
 
         // Get the largest circle adjacent to circle
-        Roi circleB = (Roi)Collections.max(adjCircles, Comparator.comparing((c) -> {
-            return c.getFloatWidth();
-        }));
+        Roi circleB = Collections.max(adjCircles, Comparator.comparing((c) -> c.getFloatWidth() ));
+
         // A and B are the centroids or circle and circleB
         Point2D pointA = this.getCentroid(circle);
         Point2D pointB = this.getCentroid(circleB);
@@ -102,14 +102,11 @@ public class CirclesBasedSpine {
         // Iterate the spine (from circleB excluded using A->B)
         // and add it to spineB
         spineB.addAll(this.iterateSpine(this.circles, circle, circleB));
-        float[] xPoints = this.toFloatArray(spineB.stream().mapToDouble((m) -> {
-            return m.getX();
-        }).toArray());
-        float[] yPoints = this.toFloatArray(spineB.stream().mapToDouble((m) -> {
-            return m.getY();
-        }).toArray());
+        float[] xPoints = this.toFloatArray(spineB.stream().mapToDouble(m -> m.getX()).toArray());
+        float[] yPoints = this.toFloatArray(spineB.stream().mapToDouble(m -> m.getY()).toArray());
         // Create a polygon and set name "Spine"
         this.spine = new PolygonRoi(xPoints, yPoints, 6);
+        int pos = circle.getPosition();
         this.spine.setName("Spine");
         return this.spine;
     }
@@ -222,6 +219,8 @@ public class CirclesBasedSpine {
         Line line = new Line(ca.getX(), ca.getY(), cb.getX(), cb.getY());
         line.setStrokeColor(color);
         line.setStrokeWidth(2.0F);
+        line.setPosition(circleA.getPosition());
+        line.setName("SpinePart");
         return line;
     }
 
@@ -307,3 +306,4 @@ public class CirclesBasedSpine {
         }
     }
 }
+
