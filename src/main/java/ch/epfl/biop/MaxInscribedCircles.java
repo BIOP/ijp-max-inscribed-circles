@@ -306,7 +306,8 @@ public class MaxInscribedCircles {
 		 * @return this builder
 		 */
 		public Builder minimumDiameter(double minimumDiameter) {
-			if (minimumDiameter < 1) throw new IllegalArgumentException("Minimum diameter must be larger than 1 pixel");
+			if (minimumDiameter == 0)
+				IJ.log("Minimum diameter is 0, returning largest circle only");
 			this.minimumDiameter = minimumDiameter;
 			return this;
 		}
