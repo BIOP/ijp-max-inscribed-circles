@@ -12,7 +12,7 @@
     <groupId>ch.epfl.biop</groupId>
     <artifactId>MaxInscribedCircles</artifactId>
     <description>Mavenized Improved fit largest circle plugin</description>
-    <version>2.0.2-SNAPSHOT</version>
+    <version>2.0.2</version>
 
     <name>Max Inscribed Circles</name>
     <url>http://biop.epfl.ch</url>
@@ -90,7 +90,7 @@
     <scm>
         <connection>scm:git:https://github.com/BIOP/ijp-max-inscribed-circles</connection>
         <developerConnection>scm:git:git@github.com:BIOP/ijp-max-inscribed-circles</developerConnection>
-        <tag>MaxInscribedCircles-2.0.0</tag>
+        <tag>MaxInscribedCircles-2.0.2</tag>
         <url>https://github.com/BIOP/ijp-max-inscribed-circles</url>
     </scm>
 
