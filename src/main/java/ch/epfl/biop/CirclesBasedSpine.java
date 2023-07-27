@@ -167,7 +167,7 @@ public class CirclesBasedSpine {
                 // add this line to this.ov
                 this.ov.add(line);
                 // add the extremity point to the spinePoints
-                spinePoints.add(new Point2D.Double((double)line.getFloatPolygon().xpoints[2], (double)line.getFloatPolygon().ypoints[2]));
+                spinePoints.add(new Point2D.Double((double)line.getFloatPolygon(0).xpoints[1], (double)line.getFloatPolygon(0).ypoints[1]));
             }
         }
         // set this.ov as overlay
@@ -245,7 +245,7 @@ public class CirclesBasedSpine {
             inMask = this.imp.getProcessor().getf((int)Math.round(c2.getX()), (int)Math.round(c2.getY())) == 255.0F;
         }
         // create a circle c with centroid c2 radius 10
-        Roi c = new OvalRoi(c2.getX() - 10.0D, c2.getY() - 10.0D, 20.0D, 20.0D);
+        Roi c = new OvalRoi((int)Math.round(c2.getX()) - 10, (int)Math.round(c2.getY()) - 10, 20, 20);
         // return a line between circle and c
         return this.makeLine(circle, c, new Color(255, 0, 0));
     }
