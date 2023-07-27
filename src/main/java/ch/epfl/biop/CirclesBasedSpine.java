@@ -228,22 +228,24 @@ public class CirclesBasedSpine {
         Point2D c1 = this.getCentroid(circle);
         double r1 = circle.getFloatWidth() / 2.0D;
 
-        // c2 is the extremity of the circle in the direction of vector
+        // magnitude is the length of the vector:
         double magnitude = vector.distance(0,0);
 
-        Point2D c2 = new Point2D.Double(c1.getX() + r1 * vector.getX() / magnitude, c1.getY() + r1 * vector.getY() / magnitude );
+        // c2 is 1 pixel before the extremity of the circle in the direction of vector
+        Point2D c2 = new Point2D.Double(c1.getX() + (r1 - 1.0D) * vector.getX() / magnitude, c1.getY() + (r1 - 1.0D) * vector.getY() / magnitude );
+        // c2temp is the extremity of the circle in the direction of vector
+        Point2D c2temp = new Point2D.Double(c1.getX() + r1 * vector.getX() / magnitude, c1.getY() + r1 * vector.getY() / magnitude );
 
-        // Double check that the above is the same as below
-        //Point2D c2 = c1.add(new Point2D(r1 * vector.getX() / vector.magnitude(), r1 * vector.getY() / vector.magnitude()));
 
-        // check it is inMask
-        Boolean inMask = this.imp.getProcessor().getf((int)Math.round(c2.getX()), (int)Math.round(c2.getY())) == 255.0F;
+        // check if the pixel close to c2temp is inMask
+        Boolean inMask = this.imp.getProcessor().getf((int)Math.round(c2temp.getX()), (int)Math.round(c2temp.getY())) == 255.0F;
         // while it is inMask increase by one pixel in vector direction
         for(int i = 1; inMask; ++i) {
-            c2 = new Point2D.Double(c1.getX() + ( r1 + (double) i ) * vector.getX() / magnitude, c1.getY() + (r1 +(double) i) * vector.getY() / magnitude );
-            //c2 = c1.add(new Point2D((r1 + (double)i) * vector.getX() / vector.magnitude(), (r1 + (double)i) * vector.getY() / vector.magnitude()));
-            inMask = this.imp.getProcessor().getf((int)Math.round(c2.getX()), (int)Math.round(c2.getY())) == 255.0F;
+            c2 = c2temp;
+            c2temp = new Point2D.Double(c1.getX() + ( r1 + (double) i ) * vector.getX() / magnitude, c1.getY() + (r1 +(double) i) * vector.getY() / magnitude );
+            inMask = this.imp.getProcessor().getf((int)Math.round(c2temp.getX()), (int)Math.round(c2temp.getY())) == 255.0F;
         }
+        // At this step the pixel close to c2 is in mask but c2temp is not.
         // create a circle c with centroid c2 radius 10
         Roi c = new OvalRoi((int)Math.round(c2.getX()) - 10, (int)Math.round(c2.getY()) - 10, 20, 20);
         // return a line between circle and c
