@@ -204,7 +204,6 @@ public class MaxInscribedCircles {
 				double r = dist_map_ip.getInterpolatedValue(p.x, p.y);
 				ArrayList<Double> neigh = findNeighbors(p, hits, dist_map_ip);
 				if (neigh.size() > 1) {
-
 					for (Double pp : neigh) {
 						double r2 = dist_map_ip.getInterpolatedValue(pp.x, pp.y);
 						if (r < r2) {
@@ -256,7 +255,7 @@ public class MaxInscribedCircles {
 
 		for (int i = 1; i < hits.size(); ++i) {
 			Double p = hits.get(i);
-			if (ip.getInterpolatedValue(p.x, p.y) < ip.getInterpolatedValue(hits.get(0).x, hits.get(0).y)) {
+			if (ip.getInterpolatedValue(p.x, p.y) <= ip.getInterpolatedValue(hits.get(0).x, hits.get(0).y)) {
 				ind = i;
 				break;
 			}
